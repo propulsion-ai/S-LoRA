@@ -203,7 +203,13 @@ __global__ void bgmv_multi_lora_rank_expand_kernel(T* __restrict__ Y, const T* _
   }
 
   if (threadIdx.x == 0) {
-    Y[batch_idx * feat_out + tile_idx * (tz * ty) + threadIdx.z * ty + threadIdx.y] += sum;
+    // try {
+    //   Y[batch_idx * feat_out + tile_idx * (tz * ty) + threadIdx.z * ty + threadIdx.y] += sum;
+    // } catch (const std::exception& e) {
+      float* Y_float = reinterpret_cast<float*>(Y);
+      size_t index = batch_idx * feat_out + tile_idx * (tz * ty) + threadIdx.z * ty + threadIdx.y;
+      Y_float[index] += sum;
+    // }
   }
 }
 

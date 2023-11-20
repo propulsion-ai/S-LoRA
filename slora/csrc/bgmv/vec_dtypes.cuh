@@ -29,6 +29,14 @@ struct vec_t {
   FLASHINFER_INLINE static void memcpy(float_t *dst, const float_t *src);
 };
 
+// Define make_bfloat162 for GPUs that do not support bfloat16
+nv_bfloat162 custom_make_bfloat162(nv_bfloat16 val1, nv_bfloat16 val2) {
+    nv_bfloat162 result;
+    result.x = val1;
+    result.y = val2;
+    return result;
+}
+
 template <typename src_float_t, typename tgt_float_t, size_t vec_size>
 FLASHINFER_INLINE void cast_from_impl(const vec_t<src_float_t, vec_size> &src,
                                       vec_t<tgt_float_t, vec_size> &dst) {
@@ -882,7 +890,7 @@ struct vec_t<nv_bfloat16, 2> {
 };
 
 FLASHINFER_INLINE void vec_t<nv_bfloat16, 2>::fill(nv_bfloat16 val) {
-  data = make_bfloat162(val, val);
+  data = custom_make_bfloat162(val, val);
 }
 
 FLASHINFER_INLINE void vec_t<nv_bfloat16, 2>::load(const nv_bfloat16 *ptr) {
@@ -931,8 +939,8 @@ struct vec_t<nv_bfloat16, 4> {
 };
 
 FLASHINFER_INLINE void vec_t<nv_bfloat16, 4>::fill(nv_bfloat16 val) {
-  *(nv_bfloat162 *)(&data.x) = make_bfloat162(val, val);
-  *(nv_bfloat162 *)(&data.y) = make_bfloat162(val, val);
+  *(nv_bfloat162 *)(&data.x) = custom_make_bfloat162(val, val);
+  *(nv_bfloat162 *)(&data.y) = custom_make_bfloat162(val, val);
 }
 
 FLASHINFER_INLINE void vec_t<nv_bfloat16, 4>::load(const nv_bfloat16 *ptr) {
@@ -963,10 +971,10 @@ struct vec_t<nv_bfloat16, vec_size> {
   FLASHINFER_INLINE void fill(nv_bfloat16 val) {
 #pragma unoll
     for (size_t i = 0; i < vec_size / 8; ++i) {
-      *(nv_bfloat162 *)(&(data[i].x)) = make_bfloat162(val, val);
-      *(nv_bfloat162 *)(&(data[i].y)) = make_bfloat162(val, val);
-      *(nv_bfloat162 *)(&(data[i].z)) = make_bfloat162(val, val);
-      *(nv_bfloat162 *)(&(data[i].w)) = make_bfloat162(val, val);
+      *(nv_bfloat162 *)(&(data[i].x)) = custom_make_bfloat162(val, val);
+      *(nv_bfloat162 *)(&(data[i].y)) = custom_make_bfloat162(val, val);
+      *(nv_bfloat162 *)(&(data[i].z)) = custom_make_bfloat162(val, val);
+      *(nv_bfloat162 *)(&(data[i].w)) = custom_make_bfloat162(val, val);
     }
   }
   FLASHINFER_INLINE void load(const nv_bfloat16 *ptr) {
